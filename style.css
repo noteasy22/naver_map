@@ -1,34 +1,35 @@
-/* 1. 모든 일반 버튼 스타일 (메인 버튼, 상세 보기 등) */
+/* 1. 기본 버튼 스타일 (상세보기, 메인으로 등 일반 버튼) */
 .stButton > button {
-    border-radius: 20px;
-    background-color: #4CAF50; /* 초록색 배경 */
-    color: white;
-    border: none;
-    transition: 0.3s;
+    border-radius: 20px !important;
+    background-color: #4CAF50 !important; /* 초록색 배경 */
+    color: white !important;
+    border: none !important;
+    padding: 0.5rem 1rem !important;
+    transition: 0.3s !important;
 }
 
 .stButton > button:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
+    background-color: #45a049 !important;
+    transform: translateY(-2px) !important;
 }
 
-/* 2. 검색창 (TextInput) 디자인: 연한 연두색 배경 */
+/* 2. 검색어창 배경색 (연한 연두색) */
 div[data-testid="stTextInput"] div[data-baseweb="input"] {
-    background-color: #E8F5E9 !important; /* 연한 연두색 */
+    background-color: #E8F5E9 !important;
     border-radius: 15px !important;
     border: 1px solid #C8E6C9 !important;
 }
 
 div[data-testid="stTextInput"] input {
     background-color: #E8F5E9 !important;
-    border: none !important;
+    color: #2E7D32 !important;
 }
 
-/* 3. 해시태그 버튼 전용 스타일: 박스 제거, 글자만 표시 */
-/* 검색창 아래 컬럼(column) 안에 있는 버튼들만 타겟팅합니다. */
+/* 3. 해시태그 버튼 전용 (검색창 아래 나열된 것들만) */
+/* 작은 컬럼(column) 안에 있는 버튼들만 배경과 테두리를 없앱니다. */
 div[data-testid="column"] .stButton > button {
     background-color: transparent !important; /* 배경 투명 */
-    color: #4CAF50 !important; /* 글자색 초록색 */
+    color: #4CAF50 !important; /* 글자색 초록 */
     border: none !important;
     box-shadow: none !important;
     padding: 0px 5px !important;
@@ -43,15 +44,4 @@ div[data-testid="column"] .stButton > button:hover {
     background-color: transparent !important;
     color: #2E7D32 !important;
     text-decoration: underline !important; /* 마우스 올리면 밑줄 */
-}
-
-/* 4. 탭(Tabs) 디자인 */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 10px;
-}
-
-.stTabs [data-baseweb="tab"] {
-    height: 50px;
-    background-color: #f0f2f6;
-    border-radius: 10px 10px 0px 0px;
 }
