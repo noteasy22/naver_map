@@ -105,7 +105,7 @@ if st.session_state.page == 'main':
     with col_left:
         current_query = search_input if search_input else st.session_state.search_query
         if len(current_query) >= 2:
-            st.subheader(f"🔎 '{current_query}' 검색 결과")
+            st.subheader(f"'{current_query}' 검색 결과")
             search_res = df_unique[df_unique['제목'].str.contains(current_query)]
             for _, row in search_res.iterrows():
                 c1, c2 = st.columns([8, 2])
