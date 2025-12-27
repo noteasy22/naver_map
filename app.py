@@ -7,7 +7,7 @@ from collections import Counter
 # 1. 페이지 설정
 st.set_page_config(page_title="Naver KiN Insight", layout="wide")
 
-# 외부 CSS 로드 함수
+# style.css 로드 함수
 def local_css(file_name):
     if os.path.exists(file_name):
         with open(file_name, encoding="utf-8") as f:
@@ -71,9 +71,10 @@ if st.session_state.page == 'main':
             st.session_state.page = 'my_questions'
             st.rerun()
 
+    # 검색창 (연두색 적용됨)
     search_input = st.text_input("검색어를 입력하세요", value=st.session_state.search_query)
 
-    # --- 실시간 해시태그 ---
+    # --- 해시태그 (박스 없이 글자만) ---
     if df is not None:
         all_text = " ".join(df['질문내용'].astype(str).tolist())
         words_only = re.findall(r'[가-힣]{2,}', all_text)
@@ -131,6 +132,7 @@ if st.session_state.page == 'main':
 
 # [상세 보기]
 elif st.session_state.page == 'detail':
+    # 기존 상세페이지 로직 유지...
     doc_id = st.session_state.selected_doc_id
     q_data = df[df['doc_id'] == doc_id].iloc[0]
     answers = df[df['doc_id'] == doc_id]
@@ -160,7 +162,6 @@ elif st.session_state.page == 'detail':
 elif st.session_state.page == 'my_questions':
     st.title("🙋 나의 질문 모아보기")
     my_q_list = df.drop_duplicates('doc_id').head(3) 
-    
     for _, row in my_q_list.iterrows():
         with st.container():
             col_q, col_btn = st.columns([8, 2])
