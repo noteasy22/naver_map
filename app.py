@@ -7,42 +7,13 @@ from collections import Counter
 # 1. 페이지 설정
 st.set_page_config(page_title="Naver KiN Insight", layout="wide")
 
-# CSS: 검색창 색상 유지 및 해시태그 디자인 최적화
-st.markdown("""
-    <style>
-    .main-btn { position: fixed; bottom: 20px; right: 20px; z-index: 99; }
-    
-    /* 검색창 연두색 배경 (네모 박스 느낌 제거 및 둥글게) */
-    div[data-baseweb="input"] {
-        background-color: #E8F5E9 !important;
-        border-radius: 20px !important;
-        border: none !important;
-    }
-    input {
-        background-color: #E8F5E9 !important;
-        font-size: 15px !important;
-    }
+# 외부 CSS 로드 함수
+def local_css(file_name):
+    if os.path.exists(file_name):
+        with open(file_name, encoding="utf-8") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-    /* 해시태그 버튼: 크기를 줄이고 박스 테두리 제거 */
-    div.stButton > button {
-        border: none !important;
-        background-color: transparent !important;
-        color: #4CAF50 !important;
-        padding: 0px 5px !important;
-        font-size: 13px !important;  /* 글씨 크기 축소 */
-        font-weight: 500 !important;
-        min-height: 25px !important;
-        height: 25px !important;
-    }
-    div.stButton > button:hover {
-        color: #2E7D32 !important;
-        text-decoration: underline !important;
-    }
-    
-    /* 구분선 두께 조절 */
-    hr { margin: 10px 0px !important; }
-    </style>
-    """, unsafe_allow_html=True)
+local_css("style.css")
 
 # 세션 상태 초기화
 if 'page' not in st.session_state:
@@ -52,7 +23,7 @@ if 'selected_doc_id' not in st.session_state:
 if 'search_query' not in st.session_state:
     st.session_state.search_query = ""
 
-# 2. 데이터 로드 (사용자 프로젝트 환경 기반)
+# 2. 데이터 로드
 @st.cache_data
 def load_data():
     base_path = os.path.dirname(__file__)
@@ -60,7 +31,6 @@ def load_data():
     if not os.path.exists(file_path):
         return None
     df = pd.read_csv(file_path)
-    # 데이터 클리닝
     df['제목'] = df['제목'].fillna("제목 없음").astype(str)
     df['질문내용'] = df['질문내용'].fillna("내용 없음").astype(str)
     df['답변내용'] = df['답변내용'].fillna("").astype(str)
@@ -85,7 +55,6 @@ def get_traffic_light(score):
 
 # --- 페이지 로직 ---
 
-# 메인 복귀 버튼 (공통)
 if st.session_state.page != 'main':
     if st.button("🏠 메인으로", key="main_btn"):
         st.session_state.page = 'main'
@@ -102,10 +71,9 @@ if st.session_state.page == 'main':
             st.session_state.page = 'my_questions'
             st.rerun()
 
-    # 검색창
     search_input = st.text_input("검색어를 입력하세요", value=st.session_state.search_query)
 
-    # --- 해시태그 디자인 수정 (작고 박스 없이 나열) ---
+    # --- 실시간 해시태그 ---
     if df is not None:
         all_text = " ".join(df['질문내용'].astype(str).tolist())
         words_only = re.findall(r'[가-힣]{2,}', all_text)
@@ -113,13 +81,11 @@ if st.session_state.page == 'main':
         filtered_words = [w for w in words_only if w not in stop_words]
         top_4_tags = [tag for tag, count in Counter(filtered_words).most_common(4)]
 
-        # 아주 작은 컬럼으로 나열하여 '네모 박스' 느낌 제거
         tag_cols = st.columns([0.8, 0.8, 0.8, 0.8, 6])
         for i, tag in enumerate(top_4_tags):
             if tag_cols[i].button(f"#{tag}", key=f"htag_{tag}"):
                 st.session_state.search_query = tag
                 st.rerun()
-    # --------------------------------------------------
 
     st.divider()
 
@@ -182,7 +148,6 @@ elif st.session_state.page == 'detail':
 
     st.title(f"Q: {q_data['제목']}")
     st.write(f"👁️ 조회수: {int(q_data['조회수'])} | 📅 수집일: {q_data['collected_at']}")
-    
     st.info(f"**질문내용:** {q_data['질문내용']}")
     
     st.subheader(f"💬 답변 목록 ({len(answers)}개)")
