@@ -1,0 +1,30 @@
+/* 1. 모든 버튼을 둥글고 예쁘게 수정 */
+.stButton > button {
+    border-radius: 20px; /* 둥근 모서리 */
+    background-color: #4CAF50; /* 피그마 메인 색상 */
+    color: white;
+    border: none;
+    transition: 0.3s;
+}
+
+/* 2. 버튼에 마우스 올렸을 때 효과 */
+.stButton > button:hover {
+    background-color: #45a049;
+    transform: translateY(-2px); /* 살짝 떠오르는 효과 */
+}
+
+/* 3. 탭(Tabs) 디자인 강조 */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 10px;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 50px;
+    background-color: #f0f2f6;
+    border-radius: 10px 10px 0px 0px;
+}
+
+/* 4. 사이드바 검색창 둥글게 */
+.stTextInput > div > div > input {
+    border-radius: 15px;
+}
