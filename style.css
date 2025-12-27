@@ -1,43 +1,48 @@
-/* 1. 모든 버튼 스타일 */
+/* 1. 모든 버튼 스타일 (둥글게, 색상 적용) */
 .stButton > button {
     border-radius: 20px;
-    background-color: #4CAF50;
+    background-color: #4CAF50; /* 피그마 메인 색상 */
     color: white;
     border: none;
     transition: 0.3s;
+    font-weight: 600;
 }
 
 .stButton > button:hover {
     background-color: #45a049;
     transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
-/* 2. 오늘의 핫토픽 상자 (st.info) 너비 조절 */
+/* 2. 오늘의 핫토픽 상자 (st.info) 너비 줄이기 */
 .stAlert {
-    max-width: 85% !important; /* 너무 짧지 않게 85%로 설정 */
+    max-width: 85% !important; /* 화면의 85%만 차지 */
     margin: 0 auto !important; /* 가운데 정렬 */
+    border-radius: 12px;
 }
 
-/* 3. 탭(Tabs) 디자인 */
+/* 3. 탭(Tabs) 디자인 강조 */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
 }
 
 .stTabs [data-baseweb="tab"] {
-    height: 50px;
+    height: 45px;
     background-color: #f0f2f6;
     border-radius: 10px 10px 0px 0px;
+    padding: 0 20px;
 }
 
-/* 4. 입력창 및 로그인 폼 디자인 */
+/* 4. 입력창 및 검색창 디자인 */
 .stTextInput > div > div > input {
     border-radius: 15px;
+    border: 1px solid #d0d0d0;
 }
 
-/* 로그인 폼을 감싸는 컨테이너 스타일 */
-[data-testid="stExpander"], .login-box {
-    border-radius: 15px;
-    border: 1px solid #e0e0e0;
-    padding: 20px;
+/* 5. 로그인 컨테이너 등 카드형 박스 스타일 */
+[data-testid="stMetric"] {
     background-color: #ffffff;
+    border: 1px solid #eee;
+    padding: 15px;
+    border-radius: 15px;
 }
