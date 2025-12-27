@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import os
+import re
 from collections import Counter
 
 # 1. 페이지 설정
@@ -10,6 +11,14 @@ st.set_page_config(page_title="Naver KiN Insight", layout="wide")
 st.markdown("""
     <style>
     .main-btn { position: fixed; bottom: 20px; right: 20px; z-index: 99; }
+    /* 해시태그 스타일링 */
+    div.stButton > button.tag-btn {
+        border-radius: 20px;
+        color: #4CAF50;
+        border: 1px solid #4CAF50;
+        background: white;
+        padding: 2px 10px;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -71,7 +80,27 @@ if st.session_state.page == 'main':
             st.session_state.page = 'my_questions'
             st.rerun()
 
+    # 검색창
     search_input = st.text_input("검색어를 입력하세요", value=st.session_state.search_query)
+
+    # --- 추가된 부분: 질문내용 기반 인기 키워드 4개 ---
+    if df is not None:
+        # 질문내용에서 단어 추출 및 빈도 계산
+        all_text = " ".join(df['질문내용'].astype(str).tolist())
+        words = re.findall(r'[가-힣]{2,}', all_text)
+        # 의미 없는 단어 제외
+        stop_words = ['제가', '저는', '하고', '하면', '있나요', '있을까요', '궁금합니다', '어떻게', '알려주세요', '관련', '대한', '진짜', '오늘']
+        keywords = [w for w in words if w not in stop_words]
+        top_4 = [tag for tag, count in Counter(keywords).most_common(4)]
+
+        # 해시태그 버튼 배치
+        cols = st.columns([1, 1, 1, 1, 6])
+        for i, tag in enumerate(top_4):
+            if cols[i].button(f"#{tag}", key=f"htag_{tag}"):
+                st.session_state.search_query = tag
+                st.rerun()
+    # ----------------------------------------------
+
     st.divider()
 
     col_left, col_right = st.columns([7, 3])
@@ -79,8 +108,8 @@ if st.session_state.page == 'main':
     with col_right:
         st.subheader("🔥 오늘의 핫토픽")
         df_unique = df.drop_duplicates('doc_id')
-        words = " ".join(df_unique['제목']).split()
-        most_common = Counter([w for w in words if len(w) > 1]).most_common(5)
+        words_title = " ".join(df_unique['제목']).split()
+        most_common = Counter([w for w in words_title if len(w) > 1]).most_common(5)
         for i, (word, count) in enumerate(most_common):
             if st.button(f"{i+1}. {word} ({count}건)", key=f"hot_{word}", use_container_width=True):
                 st.session_state.search_query = word
@@ -88,14 +117,12 @@ if st.session_state.page == 'main':
         
         st.write("")
         st.subheader("🔝 실시간 인기 질문")
-        # 그룹화 및 집계
         rank_df = df.groupby('doc_id').agg({
             '제목': 'first', 
             '조회수': 'max', 
             '답변순번': 'max'
         }).sort_values(by='답변순번', ascending=False).head(5)
         
-        # 순서(Index)를 없애기 위해 hide_index=True 적용
         st.dataframe(
             rank_df[['제목', '조회수', '답변순번']].rename(columns={'답변순번': '답변수'}),
             hide_index=True,
@@ -103,10 +130,12 @@ if st.session_state.page == 'main':
         )
 
     with col_left:
+        # 검색어 우선순위 결정 (입력창 vs 해시태그 클릭)
         current_query = search_input if search_input else st.session_state.search_query
         if len(current_query) >= 2:
             st.subheader(f"🔎 '{current_query}' 검색 결과")
-            search_res = df_unique[df_unique['제목'].str.contains(current_query)]
+            # 제목과 질문내용 모두에서 검색되도록 확장
+            search_res = df_unique[df_unique['제목'].str.contains(current_query) | df_unique['질문내용'].str.contains(current_query)]
             for _, row in search_res.iterrows():
                 c1, c2 = st.columns([8, 2])
                 if c1.button(f"📄 {row['제목']}", key=f"res_{row['doc_id']}", use_container_width=True):
@@ -116,13 +145,12 @@ if st.session_state.page == 'main':
                 c2.write(f"👁️ {int(row['조회수'])}")
                 st.divider()
 
-# [상세 보기 (검색 상세 & 나의 질문 상세 공용)]
+# [상세 보기]
 elif st.session_state.page == 'detail':
     doc_id = st.session_state.selected_doc_id
     q_data = df[df['doc_id'] == doc_id].iloc[0]
     answers = df[df['doc_id'] == doc_id]
 
-    # 사이드바: 신뢰도 분석
     st.sidebar.header("🛡️ 답변 신뢰도 분석")
     for _, ans_row in answers.iterrows():
         score = calculate_reliability(ans_row)
@@ -137,7 +165,6 @@ elif st.session_state.page == 'detail':
     st.title(f"Q: {q_data['제목']}")
     st.write(f"👁️ 조회수: {int(q_data['조회수'])} | 📅 수집일: {q_data['collected_at']}")
     
-    # 질문 내용: 이전 스타일(st.info)로 복구
     st.info(f"**질문내용:** {q_data['질문내용']}")
     
     st.subheader(f"💬 답변 목록 ({len(answers)}개)")
@@ -149,7 +176,6 @@ elif st.session_state.page == 'detail':
 # [나의 질문 목록 페이지]
 elif st.session_state.page == 'my_questions':
     st.title("🙋 나의 질문 모아보기")
-    # 샘플 데이터 기준 (실제 프로젝트에서는 사용자 ID 등으로 필터링 권장)
     my_q_list = df.drop_duplicates('doc_id').head(3) 
     
     for _, row in my_q_list.iterrows():
