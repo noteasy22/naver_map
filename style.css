@@ -1,6 +1,6 @@
-/* [1. 검색창] 오직 검색창만 연한 연두색 적용 */
+/* 1. 검색창: 오직 여기만 연한 연두색 배경 */
 div[data-testid="stTextInput"] div[data-baseweb="input"] {
-    background-color: #E8F5E9 !important; /* 연한 연두색 */
+    background-color: #E8F5E9 !important;
     border-radius: 15px !important;
     border: 1px solid #C8E6C9 !important;
 }
@@ -9,10 +9,10 @@ div[data-testid="stTextInput"] input {
     background-color: #E8F5E9 !important;
 }
 
-/* [2. 해시태그] 배경색 없이 글자만 (박스 제거) */
+/* 2. 해시태그: 박스/테두리 없이 글자만 표시 */
 div[data-testid="column"] .stButton > button {
-    background-color: transparent !important; /* 배경 투명 */
-    color: #4CAF50 !important; /* 글자색 초록 */
+    background-color: transparent !important;
+    color: #4CAF50 !important;
     border: none !important;
     box-shadow: none !important;
     font-size: 14px !important;
@@ -22,18 +22,20 @@ div[data-testid="column"] .stButton > button {
     min-height: 0px !important;
 }
 
-/* [3. 나머지 모든 박스들] 배경색과 동일하게 초기화 */
-/* st.info, st.success 등 알림 박스들이 연두색이 되는 것 방지 */
-div[data-testid="stNotification"], 
-div[data-testid="stExpander"],
-.stChatMessage {
-    background-color: #ffffff !important; /* 흰색 배경으로 고정 */
-    border: 1px solid #f0f2f6 !important;
-}
-
-/* [4. 일반 버튼] 상세보기, 메인으로 등은 기존 초록 테마 유지 */
+/* 3. 일반 버튼: 상세보기, 메인으로 등 흰색 버튼으로 변경 */
 .stButton > button {
     border-radius: 20px !important;
     background-color: #ffffff !important;
-    color: white !important;
+    color: #4CAF50 !important;
+    border: 1px solid #4CAF50 !important;
+}
+
+/* 4. 기타 모든 알림/메시지 박스: 흰색 배경으로 초기화 */
+div[data-testid="stNotification"], 
+div[data-testid="stExpander"], 
+div[data-testid="stChatMessageContainer"],
+.stChatMessage {
+    background-color: #ffffff !important;
+    color: #31333F !important;
+    border: 1px solid #f0f2f6 !important;
 }
