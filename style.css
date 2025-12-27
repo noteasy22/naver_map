@@ -34,6 +34,6 @@ div[data-testid="stExpander"],
 /* [4. 일반 버튼] 상세보기, 메인으로 등은 기존 초록 테마 유지 */
 .stButton > button {
     border-radius: 20px !important;
-    background-color: #4CAF50 !important;
+    background-color: #ffffff !important;
     color: white !important;
 }
