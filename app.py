@@ -155,7 +155,7 @@ elif st.session_state.page == 'my_questions':
     for _, row in my_q_list.iterrows():
         with st.container():
             col_q, col_btn = st.columns([8, 2])
-            col_q.subheader(f"📌 {row['제목']}")
+            col_q.subheader(f"{row['제목']}")
             col_q.write(f"답변수: {df[df['doc_id']==row['doc_id']]['답변순번'].max()}개")
             if col_btn.button("상세 분석 보기", key=f"my_view_{row['doc_id']}", use_container_width=True):
                 st.session_state.selected_doc_id = row['doc_id']
