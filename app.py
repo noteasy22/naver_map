@@ -7,27 +7,40 @@ from collections import Counter
 # 1. 페이지 설정
 st.set_page_config(page_title="Naver KiN Insight", layout="wide")
 
-# CSS: 검색창 연두색 배경 및 버튼 스타일 추가
+# CSS: 검색창 색상 유지 및 해시태그 디자인 최적화
 st.markdown("""
     <style>
     .main-btn { position: fixed; bottom: 20px; right: 20px; z-index: 99; }
     
-    /* 검색어 입력창 배경을 연두색으로 변경 */
+    /* 검색창 연두색 배경 (네모 박스 느낌 제거 및 둥글게) */
     div[data-baseweb="input"] {
         background-color: #E8F5E9 !important;
-        border-radius: 10px;
+        border-radius: 20px !important;
+        border: none !important;
     }
     input {
         background-color: #E8F5E9 !important;
+        font-size: 15px !important;
     }
 
-    /* 해시태그 버튼 스타일링 */
+    /* 해시태그 버튼: 크기를 줄이고 박스 테두리 제거 */
     div.stButton > button {
-        border-radius: 20px;
-        color: #4CAF50;
-        border: 1px solid #4CAF50;
-        background-color: white;
+        border: none !important;
+        background-color: transparent !important;
+        color: #4CAF50 !important;
+        padding: 0px 5px !important;
+        font-size: 13px !important;  /* 글씨 크기 축소 */
+        font-weight: 500 !important;
+        min-height: 25px !important;
+        height: 25px !important;
     }
+    div.stButton > button:hover {
+        color: #2E7D32 !important;
+        text-decoration: underline !important;
+    }
+    
+    /* 구분선 두께 조절 */
+    hr { margin: 10px 0px !important; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -89,10 +102,10 @@ if st.session_state.page == 'main':
             st.session_state.page = 'my_questions'
             st.rerun()
 
-    # 검색창 (연두색 적용됨)
+    # 검색창
     search_input = st.text_input("검색어를 입력하세요", value=st.session_state.search_query)
 
-    # --- 질문내용 중 가장 많이 언급된 명사 단어 4개 추가 ---
+    # --- 해시태그 디자인 수정 (작고 박스 없이 나열) ---
     if df is not None:
         all_text = " ".join(df['질문내용'].astype(str).tolist())
         words_only = re.findall(r'[가-힣]{2,}', all_text)
@@ -100,8 +113,8 @@ if st.session_state.page == 'main':
         filtered_words = [w for w in words_only if w not in stop_words]
         top_4_tags = [tag for tag, count in Counter(filtered_words).most_common(4)]
 
-        # 해시태그 레이아웃
-        tag_cols = st.columns([1, 1, 1, 1, 6])
+        # 아주 작은 컬럼으로 나열하여 '네모 박스' 느낌 제거
+        tag_cols = st.columns([0.8, 0.8, 0.8, 0.8, 6])
         for i, tag in enumerate(top_4_tags):
             if tag_cols[i].button(f"#{tag}", key=f"htag_{tag}"):
                 st.session_state.search_query = tag
@@ -124,14 +137,12 @@ if st.session_state.page == 'main':
         
         st.write("")
         st.subheader("🔝 실시간 인기 질문")
-        # 그룹화 및 집계
         rank_df = df.groupby('doc_id').agg({
             '제목': 'first', 
             '조회수': 'max', 
             '답변순번': 'max'
         }).sort_values(by='답변순번', ascending=False).head(5)
         
-        # 순서(Index)를 없애기 위해 hide_index=True 적용
         st.dataframe(
             rank_df[['제목', '조회수', '답변순번']].rename(columns={'답변순번': '답변수'}),
             hide_index=True,
@@ -142,7 +153,6 @@ if st.session_state.page == 'main':
         current_query = search_input if search_input else st.session_state.search_query
         if len(current_query) >= 2:
             st.subheader(f"🔎 '{current_query}' 검색 결과")
-            # 제목 또는 내용에 포함된 경우 검색
             search_res = df_unique[df_unique['제목'].str.contains(current_query) | df_unique['질문내용'].str.contains(current_query)]
             for _, row in search_res.iterrows():
                 c1, c2 = st.columns([8, 2])
@@ -159,7 +169,6 @@ elif st.session_state.page == 'detail':
     q_data = df[df['doc_id'] == doc_id].iloc[0]
     answers = df[df['doc_id'] == doc_id]
 
-    # 사이드바: 신뢰도 분석
     st.sidebar.header("🛡️ 답변 신뢰도 분석")
     for _, ans_row in answers.iterrows():
         score = calculate_reliability(ans_row)
@@ -174,7 +183,6 @@ elif st.session_state.page == 'detail':
     st.title(f"Q: {q_data['제목']}")
     st.write(f"👁️ 조회수: {int(q_data['조회수'])} | 📅 수집일: {q_data['collected_at']}")
     
-    # 질문 내용
     st.info(f"**질문내용:** {q_data['질문내용']}")
     
     st.subheader(f"💬 답변 목록 ({len(answers)}개)")
