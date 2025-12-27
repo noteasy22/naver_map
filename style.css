@@ -1,19 +1,51 @@
-/* 1. 모든 버튼을 둥글고 예쁘게 수정 */
+/* 1. 모든 일반 버튼 스타일 (메인 버튼, 상세 보기 등) */
 .stButton > button {
-    border-radius: 20px; /* 둥근 모서리 */
-    background-color: #4CAF50; /* 피그마 메인 색상 */
+    border-radius: 20px;
+    background-color: #4CAF50; /* 초록색 배경 */
     color: white;
     border: none;
     transition: 0.3s;
 }
 
-/* 2. 버튼에 마우스 올렸을 때 효과 */
 .stButton > button:hover {
     background-color: #45a049;
-    transform: translateY(-2px); /* 살짝 떠오르는 효과 */
+    transform: translateY(-2px);
 }
 
-/* 3. 탭(Tabs) 디자인 강조 */
+/* 2. 검색창 (TextInput) 디자인: 연한 연두색 배경 */
+div[data-testid="stTextInput"] div[data-baseweb="input"] {
+    background-color: #E8F5E9 !important; /* 연한 연두색 */
+    border-radius: 15px !important;
+    border: 1px solid #C8E6C9 !important;
+}
+
+div[data-testid="stTextInput"] input {
+    background-color: #E8F5E9 !important;
+    border: none !important;
+}
+
+/* 3. 해시태그 버튼 전용 스타일: 박스 제거, 글자만 표시 */
+/* 검색창 아래 컬럼(column) 안에 있는 버튼들만 타겟팅합니다. */
+div[data-testid="column"] .stButton > button {
+    background-color: transparent !important; /* 배경 투명 */
+    color: #4CAF50 !important; /* 글자색 초록색 */
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0px 5px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    height: auto !important;
+    min-height: 0px !important;
+    transform: none !important; /* 튀어오르는 효과 제거 */
+}
+
+div[data-testid="column"] .stButton > button:hover {
+    background-color: transparent !important;
+    color: #2E7D32 !important;
+    text-decoration: underline !important; /* 마우스 올리면 밑줄 */
+}
+
+/* 4. 탭(Tabs) 디자인 */
 .stTabs [data-baseweb="tab-list"] {
     gap: 10px;
 }
@@ -22,11 +54,4 @@
     height: 50px;
     background-color: #f0f2f6;
     border-radius: 10px 10px 0px 0px;
-}
-
-/* 4. 사이드바 및 메인 검색창 연한 연두색으로 수정 */
-.stTextInput > div > div > input {
-    border-radius: 15px !important;
-    background-color: #E8F5E9 !important; /* 연한 연두색 배경 */
-    border: 1px solid #C8E6C9 !important; /* 테두리도 자연스러운 연두색으로 */
 }
